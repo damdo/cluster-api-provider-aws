@@ -24,9 +24,8 @@ import (
 )
 
 func (t Template) bootstrapUserGroups() []string {
-	groups := []string{
-		cloudformation.Ref(AWSIAMGroupBootstrapper),
-	}
+	groups := make([]string, 0, 1+len(t.Spec.BootstrapUser.ExtraGroups))
+	groups = append(groups, cloudformation.Ref(AWSIAMGroupBootstrapper))
 	groups = append(groups, t.Spec.BootstrapUser.ExtraGroups...)
 	return groups
 }
@@ -60,7 +59,7 @@ func (t Template) eksConsolePolicies() *iamv1.PolicyDocument {
 					"eks:DescribeCluster",
 					"eks:ListClusters",
 					"eks:AccessKubernetesApi",
-					"ssm:GetParameter",
+					iamActionSSMGetParameter,
 					"eks:ListUpdates",
 					"eks:ListFargateProfiles",
 				},

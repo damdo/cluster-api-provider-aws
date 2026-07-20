@@ -26,6 +26,11 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 )
 
+const (
+	// eniStatusAvailable is the EC2 ENI status indicating the interface is not attached.
+	eniStatusAvailable = "available"
+)
+
 // deleteOrphanedENIs deletes network interfaces in the cluster's VPC that are
 // in "available" state (not attached to any instance or service) and reference
 // one of the cluster's security groups. These are typically left behind by NLBs
@@ -54,7 +59,7 @@ func (s *Service) deleteOrphanedENIs(ctx context.Context) error {
 			},
 			{
 				Name:   aws.String("status"),
-				Values: []string{"available"},
+				Values: []string{eniStatusAvailable},
 			},
 		},
 	}

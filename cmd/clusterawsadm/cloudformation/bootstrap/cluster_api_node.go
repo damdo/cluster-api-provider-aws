@@ -42,7 +42,7 @@ func (t Template) secretPolicy(secureSecretsBackend infrav1.SecretBackend) iamv1
 			},
 			Action: iamv1.Actions{
 				"ssm:DeleteParameter",
-				"ssm:GetParameter",
+				iamActionSSMGetParameter,
 			},
 		}
 	}

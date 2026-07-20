@@ -140,6 +140,9 @@ func GenerateCIArtifactsInjectedTemplateForDebian(input GenerateCIArtifactsInjec
 	return kustomizedTemplate, nil
 }
 
+// jsonPatchOpAdd is the JSON Patch operation for adding a value.
+const jsonPatchOpAdd = "add"
+
 type jsonPatch struct {
 	Op    string      `json:"op"`
 	Path  string      `json:"path"`
@@ -161,13 +164,13 @@ func generateInjectScriptJSONPatch(sourceTemplate []byte, objectKind, objectName
 	var patches []jsonPatch
 	if !filesPathExists {
 		patches = append(patches, jsonPatch{
-			Op:    "add",
+			Op:    jsonPatchOpAdd,
 			Path:  fmt.Sprintf("%s/files", jsonPatchPathPrefix),
 			Value: []interface{}{},
 		})
 	}
 	patches = append(patches, jsonPatch{
-		Op:   "add",
+		Op:   jsonPatchOpAdd,
 		Path: fmt.Sprintf("%s/files/-", jsonPatchPathPrefix),
 		Value: map[string]string{
 			"content":     scriptContent,
@@ -178,13 +181,13 @@ func generateInjectScriptJSONPatch(sourceTemplate []byte, objectKind, objectName
 	})
 	if !preKubeadmCommandsPathExists {
 		patches = append(patches, jsonPatch{
-			Op:    "add",
+			Op:    jsonPatchOpAdd,
 			Path:  fmt.Sprintf("%s/preKubeadmCommands", jsonPatchPathPrefix),
 			Value: []string{},
 		})
 	}
 	patches = append(patches, jsonPatch{
-		Op:    "add",
+		Op:    jsonPatchOpAdd,
 		Path:  fmt.Sprintf("%s/preKubeadmCommands/-", jsonPatchPathPrefix),
 		Value: scriptPath,
 	})

@@ -27,7 +27,8 @@ func TestCompareSlices(t *testing.T) {
 	g := NewWithT(t)
 
 	slice1 := []*string{ptr.To[string]("foo"), ptr.To[string]("bar")}
-	slice2 := []*string{ptr.To[string]("bar"), ptr.To[string]("foo")}
+	slice2 := make([]*string, 0, 3)
+	slice2 = append(slice2, ptr.To[string]("bar"), ptr.To[string]("foo"))
 
 	expected := Equals(slice1, slice2)
 	g.Expect(expected).To(BeTrue())

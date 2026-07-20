@@ -68,7 +68,7 @@ func (a *AWSAMIList) ToTable() *metav1.Table {
 		ColumnDefinitions: []metav1.TableColumnDefinition{
 			{
 				Name: "Kubernetes Version",
-				Type: "string",
+				Type: "string", //nolint:goconst
 			},
 			{
 				Name: "Region",

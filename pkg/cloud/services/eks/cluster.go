@@ -302,7 +302,7 @@ func (s *Service) deleteClusterAndWait(ctx context.Context, cluster *ekstypes.Cl
 }
 
 func makeEksEncryptionConfigs(encryptionConfig *ekscontrolplanev1.EncryptionConfig) []ekstypes.EncryptionConfig {
-	cfg := []ekstypes.EncryptionConfig{}
+	cfg := make([]ekstypes.EncryptionConfig, 0, 1)
 
 	if encryptionConfig == nil {
 		return cfg
@@ -670,9 +670,14 @@ func (s *Service) reconcileLogging(ctx context.Context, logging *ekstypes.Loggin
 	return nil
 }
 
+const (
+	defaultIPv4ZeroCIDR = "0.0.0.0/0"
+	defaultIPv6ZeroCIDR = "::/0"
+)
+
 func publicAccessCIDRsEqual(as []string, bs []string) bool {
-	allV4 := "0.0.0.0/0"
-	allV6 := "::/0"
+	allV4 := defaultIPv4ZeroCIDR
+	allV6 := defaultIPv6ZeroCIDR
 	asDefault := false
 	bsDefault := false
 

@@ -64,8 +64,8 @@ func (s *Service) AllocateDedicatedHost(ctx context.Context, spec *infrav1.Dynam
 
 	// Add tags to the allocation request
 	if len(dedicatedHostTags) > 0 {
-		var tagSpecs []types.TagSpecification
-		var tags []types.Tag
+		tagSpecs := make([]types.TagSpecification, 0, 1)
+		tags := make([]types.Tag, 0, len(dedicatedHostTags))
 		for key, value := range dedicatedHostTags {
 			tags = append(tags, types.Tag{
 				Key:   aws.String(key),

@@ -54,6 +54,23 @@ const (
 
 	// IPProtocolICMPv6 is how EC2 represents the ICMPv6 protocol in ingress rules.
 	IPProtocolICMPv6 = "icmpv6"
+
+	// Security group ingress rule descriptions.
+
+	// sgDescriptionSSH is the description for SSH ingress rules.
+	sgDescriptionSSH = "SSH"
+
+	// sgDescriptionKubernetesAPI is the description for Kubernetes API ingress rules.
+	sgDescriptionKubernetesAPI = "Kubernetes API"
+
+	// sgDescriptionNodePortServices is the description for Node Port Services ingress rules.
+	sgDescriptionNodePortServices = "Node Port Services"
+
+	// sgDescriptionKubeletAPI is the description for Kubelet API ingress rules.
+	sgDescriptionKubeletAPI = "Kubelet API"
+
+	// sgDescriptionKubernetesAPIIPv6 is the description for Kubernetes API IPv6 ingress rules.
+	sgDescriptionKubernetesAPIIPv6 = "Kubernetes API IPv6"
 )
 
 // ReconcileSecurityGroups will reconcile security groups against the Service object.
@@ -569,7 +586,7 @@ func (s *Service) revokeAllSecurityGroupIngressRules(id string) error {
 
 func (s *Service) defaultSSHIngressRule(sourceSecurityGroupID string) infrav1.IngressRule {
 	return infrav1.IngressRule{
-		Description:            "SSH",
+		Description:            sgDescriptionSSH,
 		Protocol:               infrav1.SecurityGroupProtocolTCP,
 		FromPort:               22,
 		ToPort:                 22,
@@ -603,7 +620,7 @@ func (s *Service) getSecurityGroupIngressRules(role infrav1.SecurityGroupRole) (
 		}
 		return infrav1.IngressRules{
 			{
-				Description:    "SSH",
+				Description:    sgDescriptionSSH,
 				Protocol:       infrav1.SecurityGroupProtocolTCP,
 				FromPort:       22,
 				ToPort:         22,
@@ -614,7 +631,7 @@ func (s *Service) getSecurityGroupIngressRules(role infrav1.SecurityGroupRole) (
 	case infrav1.SecurityGroupControlPlane:
 		rules := infrav1.IngressRules{
 			{
-				Description: "Kubernetes API",
+				Description: sgDescriptionKubernetesAPI,
 				Protocol:    infrav1.SecurityGroupProtocolTCP,
 				FromPort:    infrav1.DefaultAPIServerPort,
 				ToPort:      infrav1.DefaultAPIServerPort,
@@ -668,7 +685,7 @@ func (s *Service) getSecurityGroupIngressRules(role infrav1.SecurityGroupRole) (
 
 		rules := infrav1.IngressRules{
 			{
-				Description:    "Node Port Services",
+				Description:    sgDescriptionNodePortServices,
 				Protocol:       infrav1.SecurityGroupProtocolTCP,
 				FromPort:       30000,
 				ToPort:         32767,
@@ -676,7 +693,7 @@ func (s *Service) getSecurityGroupIngressRules(role infrav1.SecurityGroupRole) (
 				IPv6CidrBlocks: ipv6CidrBlocks,
 			},
 			{
-				Description: "Kubelet API",
+				Description: sgDescriptionKubeletAPI,
 				Protocol:    infrav1.SecurityGroupProtocolTCP,
 				FromPort:    10250,
 				ToPort:      10250,
@@ -963,7 +980,7 @@ func (s *Service) getIngressRulesToAllowKubeletToAccessTheControlPlaneLB() infra
 	if len(natGatewaysIPs) > 0 {
 		return infrav1.IngressRules{
 			{
-				Description: "Kubernetes API",
+				Description: sgDescriptionKubernetesAPI,
 				Protocol:    infrav1.SecurityGroupProtocolTCP,
 				FromPort:    int64(s.scope.APIServerPort()),
 				ToPort:      int64(s.scope.APIServerPort()),
@@ -996,7 +1013,7 @@ func (s *Service) getControlPlaneLBIngressRules() infrav1.IngressRules {
 func (s *Service) getIngressRuleToAllowAnyIPInTheAPIServer() infrav1.IngressRules {
 	rules := infrav1.IngressRules{
 		{
-			Description: "Kubernetes API",
+			Description: sgDescriptionKubernetesAPI,
 			Protocol:    infrav1.SecurityGroupProtocolTCP,
 			FromPort:    int64(s.scope.APIServerPort()),
 			ToPort:      int64(s.scope.APIServerPort()),
@@ -1005,7 +1022,7 @@ func (s *Service) getIngressRuleToAllowAnyIPInTheAPIServer() infrav1.IngressRule
 	}
 	if s.scope.VPC().IsIPv6Enabled() {
 		rules = append(rules, infrav1.IngressRule{
-			Description:    "Kubernetes API IPv6",
+			Description:    sgDescriptionKubernetesAPIIPv6,
 			Protocol:       infrav1.SecurityGroupProtocolTCP,
 			FromPort:       int64(s.scope.APIServerPort()),
 			ToPort:         int64(s.scope.APIServerPort()),
@@ -1018,7 +1035,7 @@ func (s *Service) getIngressRuleToAllowAnyIPInTheAPIServer() infrav1.IngressRule
 func (s *Service) getIngressRuleToAllowVPCCidrInTheAPIServer() infrav1.IngressRules {
 	rules := infrav1.IngressRules{
 		{
-			Description: "Kubernetes API",
+			Description: sgDescriptionKubernetesAPI,
 			Protocol:    infrav1.SecurityGroupProtocolTCP,
 			FromPort:    int64(s.scope.APIServerPort()),
 			ToPort:      int64(s.scope.APIServerPort()),
@@ -1027,7 +1044,7 @@ func (s *Service) getIngressRuleToAllowVPCCidrInTheAPIServer() infrav1.IngressRu
 	}
 	if s.scope.VPC().IsIPv6Enabled() {
 		rules = append(rules, infrav1.IngressRule{
-			Description:    "Kubernetes API IPv6",
+			Description:    sgDescriptionKubernetesAPIIPv6,
 			Protocol:       infrav1.SecurityGroupProtocolTCP,
 			FromPort:       int64(s.scope.APIServerPort()),
 			ToPort:         int64(s.scope.APIServerPort()),
@@ -1042,8 +1059,8 @@ func (s *Service) processIngressRulesSGs(ingressRules []infrav1.IngressRule) (in
 
 	for _, rule := range ingressRules {
 		if rule.NatGatewaysIPsSource { // if the rule has NatGatewaysIPsSource set to true, use the NAT Gateway IPs as the source
-			natGatewaysCidrs := []string{}
 			natGatewaysIPs := s.scope.GetNatGatewaysIPs()
+			natGatewaysCidrs := make([]string, 0, len(natGatewaysIPs))
 			for _, ip := range natGatewaysIPs {
 				natGatewaysCidrs = append(natGatewaysCidrs, fmt.Sprintf("%s/32", ip))
 			}

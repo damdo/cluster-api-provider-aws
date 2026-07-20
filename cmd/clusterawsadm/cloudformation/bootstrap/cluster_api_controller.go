@@ -86,7 +86,7 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"ec2:AttachNetworkInterface",
 				"ec2:DetachNetworkInterface",
 				"ec2:AllocateAddress",
-				"ec2:AssignIpv6Addresses",
+				iamActionEC2AssignIPv6Addresses,
 				"ec2:AssignPrivateIpAddresses",
 				"ec2:UnassignPrivateIpAddresses",
 				"ec2:AssociateRouteTable",
@@ -102,7 +102,7 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"ec2:CreateRouteTable",
 				"ec2:CreateSecurityGroup",
 				"ec2:CreateSubnet",
-				"ec2:CreateTags",
+				iamActionEC2CreateTags,
 				"ec2:CreateVpc",
 				"ec2:CreateVpcEndpoint",
 				"ec2:DisassociateVpcCidrBlock",
@@ -123,11 +123,11 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"ec2:DescribeAddresses",
 				"ec2:DescribeAvailabilityZones",
 				"ec2:DescribeCarrierGateways",
-				"ec2:DescribeInstances",
-				"ec2:DescribeInstanceTypes",
+				iamActionEC2DescribeInstances,
+				iamActionEC2DescribeInstanceTypes,
 				"ec2:DescribeInternetGateways",
 				"ec2:DescribeEgressOnlyInternetGateways",
-				"ec2:DescribeInstanceTypes",
+				iamActionEC2DescribeInstanceTypes,
 				"ec2:DescribeImages",
 				"ec2:DescribeNatGateways",
 				"ec2:DescribeNetworkInterfaces",
@@ -139,8 +139,8 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"ec2:DescribeDhcpOptions",
 				"ec2:DescribeVpcAttribute",
 				"ec2:DescribeVpcEndpoints",
-				"ec2:DescribeVolumes",
-				"ec2:DescribeTags",
+				iamActionEC2DescribeVolumes,
+				iamActionEC2DescribeTags,
 				"ec2:DetachInternetGateway",
 				"ec2:DisassociateRouteTable",
 				"ec2:DisassociateAddress",
@@ -222,10 +222,10 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"arn:*:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
 			},
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "autoscaling.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: "autoscaling.amazonaws.com"},
 			},
 		},
 		{
@@ -234,22 +234,22 @@ func (t Template) ControllersPolicy() *iamv1.PolicyDocument {
 				"arn:*:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing",
 			},
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: "elasticloadbalancing.amazonaws.com"},
 			},
 		},
 		{
 			Effect: iamv1.EffectAllow,
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Resource: iamv1.Resources{
 				"arn:*:iam::*:role/aws-service-role/spot.amazonaws.com/AWSServiceRoleForEC2Spot",
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "spot.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: "spot.amazonaws.com"},
 			},
 		},
 		{
@@ -359,43 +359,43 @@ func (t Template) ControllersPolicyEKS() *iamv1.PolicyDocument {
 				"arn:*:ssm:*:*:parameter/aws/service/eks/optimized-ami/*",
 			},
 			Action: iamv1.Actions{
-				"ssm:GetParameter",
+				iamActionSSMGetParameter,
 			},
 		},
 		iamv1.StatementEntry{
 			Effect: iamv1.EffectAllow,
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Resource: iamv1.Resources{
-				"arn:*:iam::*:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS",
+				"arn:*:iam::*:role/aws-service-role/" + iamServiceEKS + "/AWSServiceRoleForAmazonEKS",
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "eks.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: iamServiceEKS},
 			},
 		},
 		iamv1.StatementEntry{
 			Effect: iamv1.EffectAllow,
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Resource: iamv1.Resources{
 				"arn:*:iam::*:role/aws-service-role/eks-nodegroup.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup",
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "eks-nodegroup.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: "eks-nodegroup.amazonaws.com"},
 			},
 		},
 		iamv1.StatementEntry{
 			Effect: iamv1.EffectAllow,
 			Action: iamv1.Actions{
-				"iam:CreateServiceLinkedRole",
+				iamActionIAMCreateServiceLinkedRole,
 			},
 			Resource: iamv1.Resources{
 				"arn:" + t.Spec.Partition + ":iam::*:role/aws-service-role/eks-fargate-pods.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate",
 			},
 			Condition: iamv1.Conditions{
-				iamv1.StringLike: map[string]string{"iam:AWSServiceName": "eks-fargate.amazonaws.com"},
+				iamv1.StringLike: map[string]string{iamConditionAWSServiceName: "eks-fargate.amazonaws.com"},
 			},
 		},
 	)
@@ -499,7 +499,7 @@ func (t Template) ControllersPolicyEKS() *iamv1.PolicyDocument {
 			},
 			Condition: iamv1.Conditions{
 				"StringEquals": map[string]string{
-					"iam:PassedToService": "eks.amazonaws.com",
+					"iam:PassedToService": iamServiceEKS,
 				},
 			},
 			Effect: iamv1.EffectAllow,

@@ -45,7 +45,7 @@ func (a *AWSResourceList) ToTable() *metav1.Table {
 		ColumnDefinitions: []metav1.TableColumnDefinition{
 			{
 				Name: "Partition",
-				Type: "string",
+				Type: "string", //nolint:goconst
 			},
 			{
 				Name: "Service",

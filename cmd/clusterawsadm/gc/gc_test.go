@@ -290,7 +290,8 @@ func TestConfigureGC(t *testing.T) {
 
 func newFakeClient(scheme *runtime.Scheme, objs ...client.Object) client.Client {
 	// Add CRDs to the fake client so external.GetObjectFromContractVersionedRef can find them
-	crds := []client.Object{
+	crds := make([]client.Object, 0, 2+len(objs))
+	crds = append(crds,
 		&apiextensionsv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "awsmanagedcontrolplanes.controlplane.cluster.x-k8s.io",
@@ -345,7 +346,7 @@ func newFakeClient(scheme *runtime.Scheme, objs ...client.Object) client.Client 
 				},
 			},
 		},
-	}
+	)
 
 	allObjs := append(crds, objs...)
 	return fake.NewClientBuilder().WithScheme(scheme).WithObjects(allObjs...).Build()

@@ -5412,7 +5412,7 @@ func stubMockDescribeRouteTables(m *mocks.MockEC2APIMockRecorder) {
 }
 
 func stubMockDescribeRouteTablesWithWavelength(m *mocks.MockEC2APIMockRecorder, privSubnets, pubSubnetsIGW, pubSubnetsCarrier []string) *gomock.Call {
-	routes := []types.RouteTable{}
+	routes := make([]types.RouteTable, 0, 3)
 
 	// create public route table
 	pubTable := types.RouteTable{

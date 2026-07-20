@@ -241,7 +241,7 @@ func (ts *testStubNetworkTypes) getSubnetsWavelengthZones() (subnets []*SubnetSp
 }
 
 func (ts *testStubNetworkTypes) getSubnets() (sns Subnets) {
-	subnets := []*SubnetSpec{}
+	subnets := make([]*SubnetSpec, 0, len(ts.getSubnetsAvailabilityZones())+len(ts.getSubnetsLocalZones())+len(ts.getSubnetsWavelengthZones()))
 	subnets = append(subnets, ts.getSubnetsAvailabilityZones()...)
 	subnets = append(subnets, ts.getSubnetsLocalZones()...)
 	subnets = append(subnets, ts.getSubnetsWavelengthZones()...)

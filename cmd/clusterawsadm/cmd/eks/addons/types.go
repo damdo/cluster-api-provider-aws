@@ -56,7 +56,7 @@ func (a *availableAddonsList) ToTable() *metav1.Table {
 		ColumnDefinitions: []metav1.TableColumnDefinition{
 			{
 				Name: "Name",
-				Type: "string",
+				Type: "string", //nolint:goconst
 			},
 			{
 				Name: "Type",

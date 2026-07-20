@@ -166,7 +166,7 @@ func (r *ROSAClusterReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 	// Add a watch for clusterv1.Cluster unpaise
 	if err = controller.Watch(
 		source.Kind[client.Object](mgr.GetCache(), &clusterv1.Cluster{},
-			handler.EnqueueRequestsFromMapFunc(util.ClusterToInfrastructureMapFunc(ctx, infrav1.GroupVersion.WithKind("ROSACluster"), mgr.GetClient(), &expinfrav1.ROSACluster{})),
+			handler.EnqueueRequestsFromMapFunc(util.ClusterToInfrastructureMapFunc(ctx, infrav1.GroupVersion.WithKind(kindROSACluster), mgr.GetClient(), &expinfrav1.ROSACluster{})),
 			predicates.ClusterPausedTransitions(mgr.GetScheme(), log.GetLogger())),
 	); err != nil {
 		return fmt.Errorf("failed adding a watch for ready clusters: %w", err)
@@ -214,7 +214,7 @@ func (r *ROSAClusterReconciler) rosaControlPlaneToManagedCluster(log *logger.Log
 		}
 
 		rosaClusterRef := cluster.Spec.InfrastructureRef
-		if !rosaClusterRef.IsDefined() || rosaClusterRef.Kind != "ROSACluster" {
+		if !rosaClusterRef.IsDefined() || rosaClusterRef.Kind != kindROSACluster {
 			log.Info("InfrastructureRef is not defined or not ROSACluster, skipping mapping")
 			return nil
 		}
